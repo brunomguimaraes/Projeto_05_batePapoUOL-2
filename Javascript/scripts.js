@@ -1,4 +1,5 @@
 const messagesSection = document.querySelector(".chat-room ul");
+let mostRecentMessageChecker;
 
 function sidebarSwitch () {
     const sidebar = document.querySelector(".sidebar");
@@ -8,12 +9,13 @@ function sidebarSwitch () {
 }
 
 function searchChatRoomMessages () {
-    const messagesPromise = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v3/uol/messages");
+    let messagesPromise = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v3/uol/messages");
     messagesPromise.then(loadChatRoomMessages);
 }
 
 function loadChatRoomMessages (messagesAnswer) {
     const messages = messagesAnswer.data
+    messagesSection.innerHTML = ``
     for (let i = 0 ; i < messages.length ; i++) {
         let messageMiddleSection = ``
         let liClass;
@@ -41,7 +43,13 @@ function loadChatRoomMessages (messagesAnswer) {
         </li>`
         messagesSection.innerHTML += completeMessage
     }
-    messagesSection.querySelector("li:last-of-type").scrollIntoView();
+    
+    let activeMostRecentMessage = messagesSection.querySelector("li:last-of-type");
+    if (!mostRecentMessageChecker || mostRecentMessageChecker.innerHTML !== activeMostRecentMessage.innerHTML) {
+        activeMostRecentMessage.scrollIntoView();
+    }
+    mostRecentMessageChecker = activeMostRecentMessage;
 }
 
-searchChatRoomMessages ()
+searchChatRoomMessages();
+setInterval(searchChatRoomMessages,3000);
