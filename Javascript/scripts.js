@@ -1,5 +1,23 @@
 const messagesSection = document.querySelector(".chat-room ul");
+const initialScreen = document.querySelector(".initial-screen");
 let mostRecentMessageChecker;
+let userName;
+
+
+function checkUserName() {
+    userName = initialScreen.querySelector("input").value;
+    errorMessageArea = initialScreen.querySelector(".error-message")
+    errorMessageArea.innerHTML = ""
+    if (userName === ""){
+        errorMessageArea.innerHTML = "Por favor, digite um nome de usuário"
+        return
+    }
+    initialScreen.querySelector("input").value = "";
+
+    initialScreen.classList.add("disabled");
+    searchChatRoomMessages();
+    setInterval(searchChatRoomMessages,3000);
+}
 
 function sidebarSwitch () {
     const sidebar = document.querySelector(".sidebar");
@@ -60,5 +78,3 @@ function selectOption(ThisElement){
     ThisElement.classList.add("selected")
 }
 
-searchChatRoomMessages();
-setInterval(searchChatRoomMessages,3000);
