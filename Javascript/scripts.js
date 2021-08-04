@@ -1,4 +1,4 @@
-
+const messagesSection = document.querySelector(".chat-room ul");
 
 function sidebarSwitch () {
     const sidebar = document.querySelector(".sidebar");
@@ -14,39 +14,34 @@ function searchChatRoomMessages () {
 
 function loadChatRoomMessages (messagesAnswer) {
     const messages = messagesAnswer.data
-    console.log(messages);
-    const messagesSection = document.querySelector(".chat-room ul");
-
     for (let i = 0 ; i < messages.length ; i++) {
-        let activeObject = messages[i]
         let messageMiddleSection = ``
         let liClass;
-        if (activeObject.type === "status") {
-            liClass = "status";
-            messageMiddleSection = `<span class = "contact">${activeObject.from} </span>`;
-        } else if (activeObject.type === "private_message") {
-            liClass = "private-message";
+        if (messages[i].type === "status") {
+            liClass = `status`;
+            messageMiddleSection = `<span class = "contact">${messages[i].from} </span>`;
+        } else if (messages[i].type === "private_message") {
+            liClass = `private-message`;
             messageMiddleSection = `
-            <span class = "contact">${activeObject.from} </span>
+            <span class = "contact">${messages[i].from} </span>
             reservadamente para 
-            <span class = "contact">${activeObject.to}: </span>`
-        } else if (activeObject.type === "message") {
-            liClass = "message";
+            <span class = "contact">${messages[i].to}: </span>`
+        } else if (messages[i].type === "message") {
+            liClass = `message`;
             messageMiddleSection = `
-            <span class = "contact">${activeObject.from} </span>
+            <span class = "contact">${messages[i].from} </span>
             para 
-            <span class = "contact">${activeObject.to}: </span>`
+            <span class = "contact">${messages[i].to}: </span>`
         }
-        
         let completeMessage = `
         <li class = ${liClass}>
-            <span class = "time">(${activeObject.time})</span>
+            <span class = "time">(${messages[i].time})</span>
             ${messageMiddleSection}
-            ${activeObject.text}
+            ${messages[i].text}
         </li>`
-
         messagesSection.innerHTML += completeMessage
     }
+    messagesSection.querySelector("li:last-of-type").scrollIntoView();
 }
 
 searchChatRoomMessages ()
