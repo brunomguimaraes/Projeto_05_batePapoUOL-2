@@ -4,6 +4,7 @@
 
 body {
     font-family: 'Roboto', sans-serif;
+    font-weight: 400;
 }
 
 header {
@@ -31,12 +32,39 @@ header ion-icon {
 }
 
 
-main {
+.chat-room {
     background-color: #e5e5e5;
     padding-top: 100px;
     padding-bottom: 80px;
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
+}
+
+.chat-room li {
+    padding: 16px 8px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    line-height: 17px;
+}
+
+.chat-room li.status {
+    background-color: #DCDCDC ;
+}
+
+.chat-room li.message {
+    background-color: #FFFFFF ;
+}
+
+.chat-room li.private-message {
+    background-color: #FFDEDE ;
+}
+
+.chat-room li .time {
+    color: #AAAAAA /*Taken from colorZilla*/
+}
+
+.chat-room li .contact {
+    font-weight: 700;
 }
 
 footer {
@@ -94,7 +122,6 @@ footer ion-icon {
     background-color: #FFFFFF;
     padding: 0px 24px;
     font-size: 16px;
-    font-weight: 400;
     position: fixed;
     z-index: 3;
     top: 0;
