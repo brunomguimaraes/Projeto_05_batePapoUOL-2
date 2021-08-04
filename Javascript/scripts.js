@@ -18,25 +18,25 @@ function loadChatRoomMessages (messagesAnswer) {
     messagesSection.innerHTML = ``
     for (let i = 0 ; i < messages.length ; i++) {
         let messageMiddleSection = ``
-        let liClass;
+        let listItemClass;
         if (messages[i].type === "status") {
-            liClass = `status`;
+            listItemClass = `status`;
             messageMiddleSection = `<span class = "contact">${messages[i].from} </span>`;
         } else if (messages[i].type === "private_message") {
-            liClass = `private-message`;
+            listItemClass = `private-message`;
             messageMiddleSection = `
             <span class = "contact">${messages[i].from} </span>
             reservadamente para 
             <span class = "contact">${messages[i].to}: </span>`
         } else if (messages[i].type === "message") {
-            liClass = `message`;
+            listItemClass = `message`;
             messageMiddleSection = `
             <span class = "contact">${messages[i].from} </span>
             para 
             <span class = "contact">${messages[i].to}: </span>`
         }
         let completeMessage = `
-        <li class = ${liClass}>
+        <li class = ${listItemClass}>
             <span class = "time">(${messages[i].time})</span>
             ${messageMiddleSection}
             ${messages[i].text}
@@ -49,6 +49,15 @@ function loadChatRoomMessages (messagesAnswer) {
         activeMostRecentMessage.scrollIntoView();
     }
     mostRecentMessageChecker = activeMostRecentMessage;
+}
+
+function selectOption(ThisElement){
+    selectedUnorderedList = ThisElement.parentNode;
+    selectedItem = selectedUnorderedList.querySelector(".selected");
+    if (selectedItem) {
+        selectedItem.classList.remove("selected");
+    }
+    ThisElement.classList.add("selected")
 }
 
 searchChatRoomMessages();

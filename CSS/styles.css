@@ -38,6 +38,8 @@ header ion-icon {
     padding-bottom: 80px;
     width: 100%;
     min-height: 100vh;
+    word-wrap: break-word;
+
 }
 
 .chat-room li {
@@ -134,9 +136,6 @@ footer ion-icon {
     transition: all 100ms linear;
 }
 
-
-
-
 .sidebar li {
     padding: 8px 0px;
     display: flex;
@@ -168,6 +167,6 @@ footer ion-icon {
     display: none;
 }
 
-.sidebar li .checkmark.active {
+.sidebar li.selected .checkmark {
     display: block;
 }

@@ -46,21 +46,21 @@
                 <li>
                     Escolha um contato para enviar mensagem:
                 </li>
-                <li>
+                <li class="selected" onclick="selectOption(this)">
                     <div>
                         <ion-icon name="people"></ion-icon>
                         Todos
                     </div>
                     <ion-icon class = "checkmark" name="checkmark-sharp"></ion-icon>                
                 </li>
-                <li>
+                <li  onclick="selectOption(this)">
                     <div>
                         <ion-icon name="person-circle"></ion-icon>
                         João
                     </div>
                     <ion-icon class = "checkmark" name="checkmark-sharp"></ion-icon>              
                 </li>
-                <li>
+                <li  onclick="selectOption(this)">
                     <div>
                         <ion-icon name="person-circle"></ion-icon>
                         Maria
@@ -72,14 +72,14 @@
             <li>
                 Escolha a visibilidade:
             </li> 
-            <li>
+            <li class = "selected" onclick="selectOption(this)">
                 <div>
                     <ion-icon name="lock-open"></ion-icon>
                     Público
                 </div>
                 <ion-icon class = "checkmark" name="checkmark-sharp"></ion-icon>              
             </li>
-            <li>
+            <li onclick="selectOption(this)">
                 <div>
                     <ion-icon name="lock-closed"></ion-icon>
                     Reservadamente
