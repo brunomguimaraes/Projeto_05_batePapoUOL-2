@@ -16,8 +16,80 @@
 
 </head>
 <body>
-    
+    <div class="container">>
+        <header>
+            <img src="Images/logo.png" alt = "Logo do Bate Papo UOL">
+            <button onclick="sidebarSwitch()">
+                <ion-icon name="people"></ion-icon>
+            </button>
 
+        </header>
+
+        <main>
+            <ul class = "messages">
+            </ul>
+        </main>
+
+        <footer>
+            <div>
+                <input type="text" placeholder="Escreva aqui...">
+            </div>
+            <button>
+                <ion-icon name="paper-plane-outline"></ion-icon>
+            </button>
+        </footer>
+    </div>
+
+    <div class="dark-screen" onclick="sidebarSwitch()"></div>
+    <section class="sidebar">
+        <ul class="online-contacts">
+                <li>
+                    Escolha um contato para enviar mensagem:
+                </li>
+                <li>
+                    <div>
+                        <ion-icon name="people"></ion-icon>
+                        Todos
+                    </div>
+                    <ion-icon class = "checkmark" name="checkmark-sharp"></ion-icon>                
+                </li>
+                <li>
+                    <div>
+                        <ion-icon name="person-circle"></ion-icon>
+                        João
+                    </div>
+                    <ion-icon class = "checkmark" name="checkmark-sharp"></ion-icon>              
+                </li>
+                <li>
+                    <div>
+                        <ion-icon name="person-circle"></ion-icon>
+                        Maria
+                    </div>
+                    <ion-icon class = "checkmark" name="checkmark-sharp"></ion-icon>              
+                </li>
+        </ul>
+        <ul class="type-of-message">
+            <li>
+                Escolha a visibilidade:
+            </li> 
+            <li>
+                <div>
+                    <ion-icon name="lock-open"></ion-icon>
+                    Público
+                </div>
+                <ion-icon class = "checkmark" name="checkmark-sharp"></ion-icon>              
+            </li>
+            <li>
+                <div>
+                    <ion-icon name="lock-closed"></ion-icon>
+                    Reservadamente
+                </div>
+                <ion-icon class = "checkmark" name="checkmark-sharp"></ion-icon>              
+            </li>
+        </ul>
+    </section>
+    
+    <script src="https://unpkg.com/ionicons@5.4.0/dist/ionicons.js"></script>
     <script src="Javascript/scripts.js"></script>
 </body>
 </html>
