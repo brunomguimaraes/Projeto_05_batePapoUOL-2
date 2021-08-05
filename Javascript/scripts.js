@@ -3,7 +3,8 @@ const initialScreen = document.querySelector(".initial-screen");
 const sidebar = document.querySelector(".sidebar");
 const API_LINKS = {
     messages:"https://mock-api.bootcamp.respondeai.com.br/api/v3/uol/messages" ,
-    participants: "https://mock-api.bootcamp.respondeai.com.br/api/v3/uol/participants"
+    participants: "https://mock-api.bootcamp.respondeai.com.br/api/v3/uol/participants",
+    status:"https://mock-api.bootcamp.respondeai.com.br/api/v3/uol/status"
 }
 let mostRecentMessageChecker;
 let userName;
@@ -21,12 +22,24 @@ function checkUserName(thisButton) {
         errorMessageArea.innerHTML = "Por favor, digite um nome de usuário"
         return
     }
-    initialScreen.querySelector("input").value = "";
+    let userNamePromise = axios.post(API_LINKS.participants,{name:userName})
+    userNamePromise.then(openChatRoom);
+
+}
+
+function openChatRoom () {
     initialScreen.classList.add("disabled");
     setInterval(searchChatRoomMessages,3000);
     setInterval(searchChatRoomParticipants,10000);
+    setInterval(keepConnection,5000);
 }
 
+function userNameNotAvailable (Answer) {
+}
+
+function keepConnection () {
+    axios.post(API_LINKS.status,{name:userName})
+}
 function animateButton (thisButton) {
     thisButton.classList.add("selected");
     setTimeout(function () {
@@ -83,20 +96,18 @@ function loadChatRoomMessages (messagesAnswer) {
     mostRecentMessageChecker = activeMostRecentMessage;
 }
 
-function selectOption(element){
-    selectedUnorderedList = element.parentNode;
-    previouslySelectedItem = selectedUnorderedList.querySelector(".selected");
+function selectSidebarOption(element){
+    selectedSidebarList = element.parentNode;
+    previouslySelectedItem = selectedSidebarList.querySelector(".selected");
     if (previouslySelectedItem) {
         previouslySelectedItem.classList.remove("selected");
     }
     element.classList.add("selected");
-
-    updateMessageInfo (element,selectedUnorderedList);
-    updateInputSendingMessage();
+    updateInputSendingMessage(element,selectedSidebarList);
 }
 
-function updateMessageInfo (element,selectedUnorderedList) {
-    if (selectedUnorderedList.classList.contains("online-contacts")){
+function updateInputSendingMessage(element,selectedSidebarList) {
+    if (selectedSidebarList.classList.contains("online-contacts")){
         messageInfo.recipient = element.querySelector("span").innerHTML
     } else {
         if (element.querySelector("span").innerText === "Reservadamente") {
@@ -105,9 +116,6 @@ function updateMessageInfo (element,selectedUnorderedList) {
             messageInfo.visibility = ""
         }
     }
-}
-
-function updateInputSendingMessage() {
     const SendingMessageArea = document.querySelector("footer .message-recipient");
     SendingMessageArea.innerHTML = `Enviando para ${messageInfo.recipient}${messageInfo.visibility}`
 }
@@ -136,7 +144,7 @@ function loadChatRoomParticipants (participantsAnswer) {
             participantClass = ""
         }
         participantsArea.innerHTML += `
-        <li ${participantClass} onclick="selectOption(this)">
+        <li ${participantClass} onclick="selectSidebarOption(this)">
             <div>
                 <ion-icon name=${ionIcon}></ion-icon>
                 <span>${onlineParticipants[i].name}</span>
@@ -147,6 +155,6 @@ function loadChatRoomParticipants (participantsAnswer) {
     let selectedParticipant = participantsArea.querySelector(".selected")
     if(!selectedParticipant){
         let sendToAllParticipants = participantsArea.querySelector(":nth-child(2)")
-        selectOption(sendToAllParticipants);
+        selectSidebarOption(sendToAllParticipants);
     }
 }
