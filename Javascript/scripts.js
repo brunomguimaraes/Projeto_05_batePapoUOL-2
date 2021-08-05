@@ -86,7 +86,9 @@ function loadChatRoomMessages (messagesAnswer) {
             ${messageMiddleSection}
             ${messages[i].text}
         </li>`
-        messagesSection.innerHTML += completeMessage
+        if (listItemClass !== `private-message` || messages[i].from === userName || messages[i].to === userName || messages[i].to === "Todos") {
+            messagesSection.innerHTML += completeMessage
+        }
     }
     
     let activeMostRecentMessage = messagesSection.querySelector("li:last-of-type");
