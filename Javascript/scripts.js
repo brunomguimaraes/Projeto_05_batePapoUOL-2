@@ -7,8 +7,10 @@ const API_LINKS = {
 }
 let mostRecentMessageChecker;
 let userName;
-let selectedParticipantName;
-
+let messageInfo = {
+    recipient: "",
+    visibility: ""
+}
 
 function checkUserName(thisButton) {
     animateButton (thisButton);
@@ -20,11 +22,8 @@ function checkUserName(thisButton) {
         return
     }
     initialScreen.querySelector("input").value = "";
-
     initialScreen.classList.add("disabled");
-    searchChatRoomMessages();
     setInterval(searchChatRoomMessages,3000);
-    searchChatRoomParticipants ();
     setInterval(searchChatRoomParticipants,10000);
 }
 
@@ -91,17 +90,32 @@ function selectOption(element){
         previouslySelectedItem.classList.remove("selected");
     }
     element.classList.add("selected");
+
+    updateMessageInfo (element,selectedUnorderedList);
+    updateInputSendingMessage();
+}
+
+function updateMessageInfo (element,selectedUnorderedList) {
     if (selectedUnorderedList.classList.contains("online-contacts")){
-        selectedParticipantName = element.querySelector("span").innerHTML
-        console.log(selectedParticipantName);
+        messageInfo.recipient = element.querySelector("span").innerHTML
+    } else {
+        if (element.querySelector("span").innerText === "Reservadamente") {
+            messageInfo.visibility = " (reservadamente)"
+        } else {
+            messageInfo.visibility = ""
+        }
     }
+}
+
+function updateInputSendingMessage() {
+    const SendingMessageArea = document.querySelector("footer .message-recipient");
+    SendingMessageArea.innerHTML = `Enviando para ${messageInfo.recipient}${messageInfo.visibility}`
 }
 
 function searchChatRoomParticipants () {
     let participantsPromise = axios.get(API_LINKS.participants);
     participantsPromise.then(loadChatRoomParticipants);
 }
-
 
 function loadChatRoomParticipants (participantsAnswer) {
     let onlineParticipants = participantsAnswer.data;
@@ -116,7 +130,7 @@ function loadChatRoomParticipants (participantsAnswer) {
         } else {
             ionIcon = "person-circle";            
         }
-        if (onlineParticipants[i].name === selectedParticipantName) {
+        if (onlineParticipants[i].name === messageInfo.recipient) {
             participantClass = `class="selected"`
         } else {
             participantClass = ""

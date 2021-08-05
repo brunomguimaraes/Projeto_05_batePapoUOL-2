@@ -39,7 +39,7 @@
         <footer>
             <div>
                 <input type="text" placeholder="Escreva aqui...">
-                <div class="message-recipient disabled"></div>
+                <div class="message-recipient"></div>
             </div>
             <button>
                 <ion-icon name="paper-plane-outline"></ion-icon>
@@ -50,30 +50,6 @@
     <div class="dark-screen" onclick="sidebarSwitch()"></div>
     <nav class="sidebar">
         <ul class="online-contacts">
-                <li>
-                    Escolha um contato para enviar mensagem:
-                </li>
-                <li class="selected" onclick="selectOption(this)">
-                    <div>
-                        <ion-icon name="people"></ion-icon>
-                        Todos
-                    </div>
-                    <ion-icon class = "checkmark" name="checkmark-sharp"></ion-icon>                
-                </li>
-                <li  onclick="selectOption(this)">
-                    <div>
-                        <ion-icon name="person-circle"></ion-icon>
-                        João
-                    </div>
-                    <ion-icon class = "checkmark" name="checkmark-sharp"></ion-icon>              
-                </li>
-                <li  onclick="selectOption(this)">
-                    <div>
-                        <ion-icon name="person-circle"></ion-icon>
-                        Maria
-                    </div>
-                    <ion-icon class = "checkmark" name="checkmark-sharp"></ion-icon>              
-                </li>
         </ul>
         <ul class="type-of-message">
             <li>
@@ -82,14 +58,14 @@
             <li class = "selected" onclick="selectOption(this)">
                 <div>
                     <ion-icon name="lock-open"></ion-icon>
-                    Público
+                    <span>Público</span>
                 </div>
                 <ion-icon class = "checkmark" name="checkmark-sharp"></ion-icon>              
             </li>
             <li onclick="selectOption(this)">
                 <div>
                     <ion-icon name="lock-closed"></ion-icon>
-                    Reservadamente
+                    <span>Reservadamente</span>
                 </div>
                 <ion-icon class = "checkmark" name="checkmark-sharp"></ion-icon>              
             </li>
