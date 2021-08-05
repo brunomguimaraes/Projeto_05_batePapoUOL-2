@@ -46,12 +46,20 @@ body {
     background-color: #e7e7e7;
 }
 
+.initial-screen button.selected {
+    margin-top: 29px;
+}
+
+
 .initial-screen .error-message {
-    width: calc(100% - 100px);
-    margin-top: 24px;
+    width: 100%;
+    padding: 0px 50px;
     color: #DF0000;
     font-size: 14px;
     text-align: center;   
+    position: absolute;
+    top: 380px;
+    left: 0;
 }
 
 
@@ -110,7 +118,7 @@ header ion-icon {
 }
 
 .chat-room li .time {
-    color: #AAAAAA /*Taken from colorZilla*/
+    color: #AAAAAA /*Taken with colorZilla*/
 }
 
 .chat-room li .contact {
@@ -137,6 +145,17 @@ footer input {
     width: calc(100vw - 18px * 2 - 26px - 20px);
     font-size: 18px;
     border:none;
+}
+
+footer .message-recipient {
+    font-size: 14px;
+    font-weight: 300;
+    color: #808080; /*Taken with colorZilla*/
+    margin-top: 4px;
+}
+
+footer .message-recipient.disabled{
+    display: none;
 }
 
 footer input::placeholder {
@@ -182,6 +201,11 @@ footer ion-icon {
 .sidebar.active {
     right:0;
     transition: all 100ms linear;
+}
+
+.sidebar .online-contacts {
+    max-height: calc(100vh - 160px);
+    overflow-y: hidden;
 }
 
 .sidebar li {
