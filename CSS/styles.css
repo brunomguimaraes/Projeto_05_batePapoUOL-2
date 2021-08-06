@@ -208,7 +208,7 @@ footer ion-icon {
 
 .sidebar .online-contacts {
     max-height: calc(100vh - 160px);
-    overflow: hidden;
+    overflow: scroll;
 }
 
 .sidebar li {

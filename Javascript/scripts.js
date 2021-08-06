@@ -18,7 +18,7 @@ let messageInfo = {
 function checkUserName(thisButton) {
     animateButton (thisButton);
     userName = initialScreen.querySelector("input").value;
-    errorMessageArea = initialScreen.querySelector(".error-message")
+    const errorMessageArea = initialScreen.querySelector(".error-message")
     errorMessageArea.innerHTML = ""
     if (userName === ""){
         errorMessageArea.innerHTML = "Por favor, digite um nome de usuário"
@@ -26,6 +26,15 @@ function checkUserName(thisButton) {
     }
     let userNamePromise = axios.post(API_LINKS.participants,{name:userName})
     userNamePromise.then(openChatRoom);
+    userNamePromise.catch(printInitialScreenError);
+}
+
+function printInitialScreenError(error){
+    let errorMessage;
+    if (error.response.status === 400) {
+        errorMessage = "Ops... parece que houve um problema! Já existe alguém com esse nome na sala!"
+    }
+    initialScreen.querySelector(".error-message").innerHTML = errorMessage
 
 }
 
@@ -43,8 +52,15 @@ function openChatRoom () {
 }
 
 function keepConnection () {
-    axios.post(API_LINKS.status,{name:userName})
+    let connectionStatus = axios.post(API_LINKS.status,{name:userName});
+    connectionStatus.catch(reloadPage);
 }
+
+function reloadPage(error) {
+    alert ("Nos desculpe! Parece que ocorreu um erro :/ Vamos reiniciar a página, por favor tente entrar na sala novamente")
+    window.location.reload()
+}
+
 function animateButton (thisButton) {
     thisButton.classList.add("selected");
     setTimeout(function () {
@@ -61,6 +77,8 @@ function sidebarSwitch () {
 function searchChatRoomMessages () {
     let messagesPromise = axios.get(API_LINKS.messages);
     messagesPromise.then(loadChatRoomMessages);
+    messagesPromise.catch(reloadPage)
+
 }
 
 function loadChatRoomMessages (messagesAnswer) {
@@ -132,6 +150,7 @@ function updateInputSendingMessage(element,selectedSidebarList) {
 function searchChatRoomParticipants () {
     let participantsPromise = axios.get(API_LINKS.participants);
     participantsPromise.then(loadChatRoomParticipants);
+    participantsPromise.catch(reloadPage)
 }
 
 function loadChatRoomParticipants (participantsAnswer) {
@@ -179,6 +198,8 @@ function sendMessage () {
         text: messageInfo.text
         })
         sentMessage.then(searchChatRoomMessages);
+        sentMessage.catch(reloadPage);
+
     } else {
         alert("Sua mensagem precisa conter algum texto!");
     }
