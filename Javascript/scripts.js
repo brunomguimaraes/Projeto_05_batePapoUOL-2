@@ -10,7 +10,9 @@ let mostRecentMessageChecker;
 let userName;
 let messageInfo = {
     recipient: "",
-    visibility: ""
+    visibility: "",
+    text: "",
+    type: "message"
 }
 
 function checkUserName(thisButton) {
@@ -32,9 +34,6 @@ function openChatRoom () {
     setInterval(searchChatRoomMessages,3000);
     setInterval(searchChatRoomParticipants,10000);
     setInterval(keepConnection,5000);
-}
-
-function userNameNotAvailable (Answer) {
 }
 
 function keepConnection () {
@@ -59,34 +58,34 @@ function searchChatRoomMessages () {
 }
 
 function loadChatRoomMessages (messagesAnswer) {
-    const messages = messagesAnswer.data
+    const downloadedMessages = messagesAnswer.data
     messagesSection.innerHTML = ``
-    for (let i = 0 ; i < messages.length ; i++) {
-        let messageMiddleSection = ``
-        let listItemClass;
-        if (messages[i].type === "status") {
-            listItemClass = `status`;
-            messageMiddleSection = `<span class = "contact">${messages[i].from} </span>`;
-        } else if (messages[i].type === "private_message") {
-            listItemClass = `private-message`;
-            messageMiddleSection = `
-            <span class = "contact">${messages[i].from} </span>
-            reservadamente para 
-            <span class = "contact">${messages[i].to}: </span>`
-        } else if (messages[i].type === "message") {
-            listItemClass = `message`;
-            messageMiddleSection = `
-            <span class = "contact">${messages[i].from} </span>
-            para 
-            <span class = "contact">${messages[i].to}: </span>`
-        }
-        let completeMessage = `
-        <li class = ${listItemClass}>
-            <span class = "time">(${messages[i].time})</span>
-            ${messageMiddleSection}
-            ${messages[i].text}
-        </li>`
-        if (listItemClass !== `private-message` || messages[i].from === userName || messages[i].to === userName || messages[i].to === "Todos") {
+    for (let i = 0 ; i < downloadedMessages.length ; i++) {
+        if (downloadedMessages[i].type !== "private_message" || downloadedMessages[i].from === userName || downloadedMessages[i].to === userName || downloadedMessages[i].to === "Todos") {
+            let messageMiddleSection = ``
+            let listItemClass;
+            if (downloadedMessages[i].type === "status") {
+                listItemClass = `status`;
+                messageMiddleSection = `<span class = "contact">${downloadedMessages[i].from} </span>`;
+            } else if (downloadedMessages[i].type === "private_message") {
+                listItemClass = `private-message`;
+                messageMiddleSection = `
+                <span class = "contact">${downloadedMessages[i].from} </span>
+                reservadamente para 
+                <span class = "contact">${downloadedMessages[i].to}: </span>`
+            } else if (downloadedMessages[i].type === "message") {
+                listItemClass = `message`;
+                messageMiddleSection = `
+                <span class = "contact">${downloadedMessages[i].from} </span>
+                para 
+                <span class = "contact">${downloadedMessages[i].to}: </span>`
+            }
+            let completeMessage = `
+            <li class = ${listItemClass}>
+                <span class = "time">(${downloadedMessages[i].time})</span>
+                ${messageMiddleSection}
+                ${downloadedMessages[i].text}
+            </li>`
             messagesSection.innerHTML += completeMessage
         }
     }
@@ -114,8 +113,10 @@ function updateInputSendingMessage(element,selectedSidebarList) {
     } else {
         if (element.querySelector("span").innerText === "Reservadamente") {
             messageInfo.visibility = " (reservadamente)"
+            messageInfo.type = "private_message"
         } else {
-            messageInfo.visibility = ""
+            messageInfo.visibility = "";
+            messageInfo.type = "message"
         }
     }
     const SendingMessageArea = document.querySelector("footer .message-recipient");
@@ -158,5 +159,21 @@ function loadChatRoomParticipants (participantsAnswer) {
     if(!selectedParticipant){
         let sendToAllParticipants = participantsArea.querySelector(":nth-child(2)")
         selectSidebarOption(sendToAllParticipants);
+    }
+}
+
+function sendMessage () {
+    messageInfo.text = document.querySelector("footer input").value;
+    document.querySelector("footer input").value = ""
+    if (messageInfo.text !== "") {
+        let sentMessage = axios.post(API_LINKS.messages,{
+        from: userName,
+        to: messageInfo.recipient,
+        type: messageInfo.type,
+        text: messageInfo.text
+        })
+        sentMessage.then(searchChatRoomMessages);
+    } else {
+        alert("Sua mensagem precisa conter algum texto!");
     }
 }
