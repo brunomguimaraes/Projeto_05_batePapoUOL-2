@@ -34,6 +34,12 @@ function openChatRoom () {
     setInterval(searchChatRoomMessages,3000);
     setInterval(searchChatRoomParticipants,10000);
     setInterval(keepConnection,5000);
+    messageInput = document.querySelector("footer input");
+    messageInput.addEventListener("keyup", function(event) {
+        if (event.key === "Enter") {
+            sendMessage ()
+        }
+    });
 }
 
 function keepConnection () {
@@ -177,3 +183,10 @@ function sendMessage () {
         alert("Sua mensagem precisa conter algum texto!");
     }
 }
+
+const usernameInput =  initialScreen.querySelector("input");
+usernameInput.addEventListener("keyup", function(event) {
+    if (event.key === "Enter") {
+        checkUserName(initialScreen.querySelector("button"));
+    }
+});
