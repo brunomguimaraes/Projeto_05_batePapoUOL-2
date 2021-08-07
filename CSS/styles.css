@@ -262,6 +262,10 @@ footer ion-icon {
     align-items: center;
 }
 
+.sidebar li.disabled{
+    color: #aeaeae;
+}
+
 .sidebar li div ion-icon {
     margin-right: 8px ;
     font-size: 24px;

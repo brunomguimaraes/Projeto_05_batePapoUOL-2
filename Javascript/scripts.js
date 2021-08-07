@@ -193,6 +193,7 @@ function loadChatRoomParticipants (participantsAnswer) {
     onlineParticipants.unshift({name:"Todos"});
     let ionIcon;
     let participantClass;
+    let participantOnclickEvent;
     const participantsArea = sidebar.querySelector(".online-contacts")
     participantsArea.innerHTML = `<li>Escolha um contato para enviar mensagem:</li>`;
     for (let i = 0 ; i < onlineParticipants.length; i++) {
@@ -206,8 +207,14 @@ function loadChatRoomParticipants (participantsAnswer) {
         } else {
             participantClass = ""
         }
+        if (onlineParticipants[i].name !== userName) {
+            participantOnclickEvent = `onclick="selectSidebarOption(this)"`
+        } else {
+            participantOnclickEvent = ""
+            participantClass = `class="disabled"`
+        }
         participantsArea.innerHTML += `
-        <li ${participantClass} onclick="selectSidebarOption(this)">
+        <li ${participantClass} ${participantOnclickEvent}>
             <div>
                 <ion-icon name=${ionIcon}></ion-icon>
                 <span>${onlineParticipants[i].name}</span>
