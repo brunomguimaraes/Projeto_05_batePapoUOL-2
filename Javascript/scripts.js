@@ -156,14 +156,30 @@ function loadChatRoomMessages (messagesAnswer) {
     }
 }
 
-function selectSidebarOption(element){
-    selectedSidebarList = element.parentNode;
-    previouslySelectedItem = selectedSidebarList.querySelector(".selected");
-    if (previouslySelectedItem) {
-        previouslySelectedItem.classList.remove("selected");
+function reloadVisibilityBar(element) {
+    const sendToAllParticipants = sidebar.querySelector(".online-contacts :nth-child(2)");
+    const privateMessageOption = sidebar.querySelector(".visibility-bar :nth-child(3)");
+    const publicMessageOption = sidebar.querySelector(".visibility-bar :nth-child(2)");
+    if (element === sendToAllParticipants) {
+        privateMessageOption.classList.remove("selected")
+        privateMessageOption.classList.add("disabled")
+        selectSidebarOption(publicMessageOption);
+    } else if (element !== publicMessageOption) {
+        privateMessageOption.classList.remove("disabled")
     }
-    element.classList.add("selected");
-    updateInputSendingMessage(element,selectedSidebarList);
+}
+
+function selectSidebarOption(element){
+    if (!element.classList.contains("disabled")) {
+        selectedSidebarList = element.parentNode;
+        previouslySelectedItem = selectedSidebarList.querySelector(".selected");
+        if (previouslySelectedItem) {
+            previouslySelectedItem.classList.remove("selected");
+        }
+        element.classList.add("selected");
+        updateInputSendingMessage(element,selectedSidebarList);
+        reloadVisibilityBar(element);
+    }
 }
 
 function updateInputSendingMessage(element,selectedSidebarList) {
@@ -193,7 +209,6 @@ function loadChatRoomParticipants (participantsAnswer) {
     onlineParticipants.unshift({name:"Todos"});
     let ionIcon;
     let participantClass;
-    let participantOnclickEvent;
     const participantsArea = sidebar.querySelector(".online-contacts")
     participantsArea.innerHTML = `<li>Escolha um contato para enviar mensagem:</li>`;
     for (let i = 0 ; i < onlineParticipants.length; i++) {
@@ -207,14 +222,11 @@ function loadChatRoomParticipants (participantsAnswer) {
         } else {
             participantClass = ""
         }
-        if (onlineParticipants[i].name !== userName) {
-            participantOnclickEvent = `onclick="selectSidebarOption(this)"`
-        } else {
-            participantOnclickEvent = ""
+        if (onlineParticipants[i].name === userName) {
             participantClass = `class="disabled"`
         }
         participantsArea.innerHTML += `
-        <li ${participantClass} ${participantOnclickEvent}>
+        <li ${participantClass} onclick="selectSidebarOption(this)">
             <div>
                 <ion-icon name=${ionIcon}></ion-icon>
                 <span>${onlineParticipants[i].name}</span>
@@ -224,6 +236,9 @@ function loadChatRoomParticipants (participantsAnswer) {
     }
     let selectedParticipant = participantsArea.querySelector(".selected")
     if(!selectedParticipant){
+        if (messageInfo.recipient !== ""){
+            alert(`O usuário ${messageInfo.recipient} saiu da sala!`);
+        }
         let sendToAllParticipants = participantsArea.querySelector(":nth-child(2)")
         selectSidebarOption(sendToAllParticipants);
     }
