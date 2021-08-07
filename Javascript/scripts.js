@@ -17,7 +17,8 @@ let messageInfo = {
     recipient: "",
     visibility: "",
     text: "",
-    type: "message"
+    type: "message",
+    ionIconName: ""
 }
 
 function checkUserName(thisButton) {
@@ -172,11 +173,14 @@ function reloadVisibilityBar(element) {
 function selectSidebarOption(element){
     if (!element.classList.contains("disabled")) {
         selectedSidebarList = element.parentNode;
-        previouslySelectedItem = selectedSidebarList.querySelector(".selected");
+        const previouslySelectedItem = selectedSidebarList.querySelector(".selected");
         if (previouslySelectedItem) {
             previouslySelectedItem.classList.remove("selected");
         }
         element.classList.add("selected");
+        if (selectedSidebarList.classList.contains("online-contacts")){
+            messageInfo.ionIconName = element.querySelector("div ion-icon").name;
+        }
         updateInputSendingMessage(element,selectedSidebarList);
         reloadVisibilityBar(element);
     }
@@ -217,7 +221,7 @@ function loadChatRoomParticipants (participantsAnswer) {
         } else {
             ionIcon = "person-circle";            
         }
-        if (onlineParticipants[i].name === messageInfo.recipient) {
+        if (onlineParticipants[i].name === messageInfo.recipient && messageInfo.ionIconName === ionIcon) {
             participantClass = `class="selected"`
         } else {
             participantClass = ""
