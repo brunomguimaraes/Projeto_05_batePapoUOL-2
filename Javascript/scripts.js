@@ -8,6 +8,11 @@ const API_LINKS = {
 }
 let mostRecentMessageChecker;
 let userName;
+let pageStatus = {
+    connection: false,
+    participants: false,
+    messages: false
+}
 let messageInfo = {
     recipient: "",
     visibility: "",
@@ -38,8 +43,28 @@ function printInitialScreenError(error){
 
 }
 
+function startLoadingScreen () {
+   const initialScreenInputItems = initialScreen.querySelector(".input-screen");
+   const LoadingScreen = initialScreen.querySelector(".loading-screen")
+   initialScreenInputItems.classList.add("disabled");
+   LoadingScreen.classList.remove("disabled");
+}
+
+function isLoadingComplete () {
+    if (pageStatus.connection && pageStatus.messages && pageStatus.participants) {
+        return true;
+    }
+    return false;
+}
+
+function stopLoadingPage () {
+    if (isLoadingComplete()){
+        initialScreen.classList.add("disabled");
+    }
+}
+
 function openChatRoom () {
-    initialScreen.classList.add("disabled");
+    startLoadingScreen ();
     setInterval(searchChatRoomMessages,3000);
     setInterval(searchChatRoomParticipants,10000);
     setInterval(keepConnection,5000);
@@ -53,6 +78,12 @@ function openChatRoom () {
 
 function keepConnection () {
     let connectionStatus = axios.post(API_LINKS.status,{name:userName});
+    connectionStatus.then(function () {
+        if (pageStatus.connection === false) {
+            pageStatus.connection = true;
+            stopLoadingPage();
+        }
+    })
     connectionStatus.catch(reloadPage);
 }
 
@@ -119,6 +150,10 @@ function loadChatRoomMessages (messagesAnswer) {
         activeMostRecentMessage.scrollIntoView();
     }
     mostRecentMessageChecker = activeMostRecentMessage;
+    if (pageStatus.messages === false) {
+        pageStatus.messages = true;
+        stopLoadingPage();
+    }
 }
 
 function selectSidebarOption(element){
@@ -184,6 +219,10 @@ function loadChatRoomParticipants (participantsAnswer) {
     if(!selectedParticipant){
         let sendToAllParticipants = participantsArea.querySelector(":nth-child(2)")
         selectSidebarOption(sendToAllParticipants);
+    }
+    if (pageStatus.participants === false) {
+        pageStatus.participants = true;
+        stopLoadingPage();
     }
 }
 
