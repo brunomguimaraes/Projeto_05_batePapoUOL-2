@@ -1,84 +1,46 @@
 const messagesSection = document.querySelector(".chat-room ul");
 const initialScreen = document.querySelector(".initial-screen");
 const sidebar = document.querySelector(".sidebar");
-const API_LINKS = {
-    messages:"https://mock-api.bootcamp.respondeai.com.br/api/v3/uol/messages" ,
-    participants: "https://mock-api.bootcamp.respondeai.com.br/api/v3/uol/participants",
-    status:"https://mock-api.bootcamp.respondeai.com.br/api/v3/uol/status"
-}
 let mostRecentMessageChecker;
 let userName;
-let pageStatus = {
+const pageStatus = {
     connection: false,
     participants: false,
     messages: false
 }
-let messageInfo = {
-    recipient: "",
+const messageInfo = {
+    recipient: {name:"", ionIcon:""},
     visibility: "",
     text: "",
     type: "message",
-    ionIconName: ""
+}
+const API_LINKS = {
+    messages: "https://mock-api.bootcamp.respondeai.com.br/api/v3/uol/messages" ,
+    participants: "https://mock-api.bootcamp.respondeai.com.br/api/v3/uol/participants",
+    status: "https://mock-api.bootcamp.respondeai.com.br/api/v3/uol/status"
 }
 
-function checkUserName(thisButton) {
-    animateButton (thisButton);
-    userName = initialScreen.querySelector("input").value;
-    const errorMessageArea = initialScreen.querySelector(".error-message")
-    errorMessageArea.innerHTML = ""
-    if (userName === ""){
-        errorMessageArea.innerHTML = "Por favor, digite um nome de usuário"
-        return
-    }
-    let userNamePromise = axios.post(API_LINKS.participants,{name:userName})
-    userNamePromise.then(openChatRoom);
-    userNamePromise.catch(printInitialScreenError);
-}
 
-function printInitialScreenError(error){
-    let errorMessage;
-    if (error.response.status === 400) {
-        errorMessage = "Ops... parece que houve um problema! Já existe alguém com esse nome na sala!"
-    }
-    initialScreen.querySelector(".error-message").innerHTML = errorMessage
-
-}
-
-function startLoadingScreen () {
-   const initialScreenInputItems = initialScreen.querySelector(".input-screen");
-   const LoadingScreen = initialScreen.querySelector(".loading-screen")
-   initialScreenInputItems.classList.add("disabled");
-   LoadingScreen.classList.remove("disabled");
-}
-
-function isLoadingComplete () {
+function isLoadingComplete() {
     if (pageStatus.connection && pageStatus.messages && pageStatus.participants) {
         return true;
     }
     return false;
 }
 
-function stopLoadingPage () {
-    if (isLoadingComplete()){
+function stopLoadingPage() {
+    if (isLoadingComplete()) {
         initialScreen.classList.add("disabled");
     }
 }
 
-function openChatRoom () {
-    startLoadingScreen ();
-    setInterval(searchChatRoomMessages,3000);
-    setInterval(searchChatRoomParticipants,10000);
-    setInterval(keepConnection,5000);
-    messageInput = document.querySelector("footer input");
-    messageInput.addEventListener("keyup", function(event) {
-        if (event.key === "Enter") {
-            sendMessage ()
-        }
-    });
+function reloadPage(error) {
+    alert("Nos desculpe! Parece que ocorreu um erro :/ Vamos reiniciar a página, por favor tente entrar na sala novamente");
+    window.location.reload();
 }
 
-function keepConnection () {
-    let connectionStatus = axios.post(API_LINKS.status,{name:userName});
+function keepConnection() {
+    const connectionStatus = axios.post(API_LINKS.status, {name:userName});
     connectionStatus.then(function () {
         if (pageStatus.connection === false) {
             pageStatus.connection = true;
@@ -88,180 +50,244 @@ function keepConnection () {
     connectionStatus.catch(reloadPage);
 }
 
-function reloadPage(error) {
-    alert ("Nos desculpe! Parece que ocorreu um erro :/ Vamos reiniciar a página, por favor tente entrar na sala novamente")
-    window.location.reload()
-}
-
-function animateButton (thisButton) {
-    thisButton.classList.add("selected");
-    setTimeout(function () {
-        thisButton.classList.remove("selected");
-    },80)
-}
-
-function sidebarSwitch () {
-    const darkScreen = document.querySelector(".dark-screen");
-    sidebar.classList.toggle("active");
-    darkScreen.classList.toggle("active");
-}
-
-function searchChatRoomMessages () {
-    let messagesPromise = axios.get(API_LINKS.messages);
-    messagesPromise.then(loadChatRoomMessages);
-    messagesPromise.catch(reloadPage)
-
-}
-
-function loadChatRoomMessages (messagesAnswer) {
-    const downloadedMessages = messagesAnswer.data
-    messagesSection.innerHTML = ``
-    for (let i = 0 ; i < downloadedMessages.length ; i++) {
-        if (downloadedMessages[i].type !== "private_message" || downloadedMessages[i].from === userName || downloadedMessages[i].to === userName || downloadedMessages[i].to === "Todos") {
-            let messageMiddleSection = ``
-            let listItemClass;
-            if (downloadedMessages[i].type === "status") {
-                listItemClass = `status`;
-                messageMiddleSection = `<span class = "contact">${downloadedMessages[i].from} </span>`;
-            } else if (downloadedMessages[i].type === "private_message") {
-                listItemClass = `private-message`;
-                messageMiddleSection = `
-                <span class = "contact">${downloadedMessages[i].from} </span>
-                reservadamente para 
-                <span class = "contact">${downloadedMessages[i].to}: </span>`
-            } else if (downloadedMessages[i].type === "message") {
-                listItemClass = `message`;
-                messageMiddleSection = `
-                <span class = "contact">${downloadedMessages[i].from} </span>
-                para 
-                <span class = "contact">${downloadedMessages[i].to}: </span>`
-            }
-            let completeMessage = `
-            <li class = ${listItemClass}>
-                <span class = "time">(${downloadedMessages[i].time})</span>
-                ${messageMiddleSection}
-                ${downloadedMessages[i].text}
-            </li>`
-            messagesSection.innerHTML += completeMessage
-        }
+function shouldUserReadThisMessage(messageObject) {
+    if (messageObject.type !== "private_message" || messageObject.from === userName || messageObject.to === userName || messageObject.to === "Todos") {
+        return true;
     }
-    
-    let activeMostRecentMessage = messagesSection.querySelector("li:last-of-type");
+    return false;
+}
+
+function createMessage(messageObject) {
+    let completeMessage;
+    if (messageObject.type === "status") {
+        completeMessage = `<li class = "status">
+        <span class = "time">(${messageObject.time})</span>
+        <span class = "contact">${messageObject.from} </span>
+        ${messageObject.text}
+    </li>`;
+    } else if (messageObject.type === "private_message") {
+        completeMessage = `<li class = "private-message">
+        <span class = "time">(${messageObject.time})</span>
+        <span class = "contact">${messageObject.from} </span>
+        reservadamente para 
+        <span class = "contact">${messageObject.to}: </span>
+        ${messageObject.text}
+    </li>`;
+    } else if (messageObject.type === "message") {
+        completeMessage = `<li class = "message">
+        <span class = "time">(${messageObject.time})</span>
+        <span class = "contact">${messageObject.from} </span>
+        para 
+        <span class = "contact">${messageObject.to}: </span>
+        ${messageObject.text}
+    </li>`;
+    }    
+    return completeMessage;
+}
+
+function scrollDownIfNewMessage() {
+    const activeMostRecentMessage = messagesSection.querySelector("li:last-of-type");
     if (!mostRecentMessageChecker || mostRecentMessageChecker.innerHTML !== activeMostRecentMessage.innerHTML) {
         activeMostRecentMessage.scrollIntoView();
     }
     mostRecentMessageChecker = activeMostRecentMessage;
+}
+
+function loadChatRoomMessages(messagesAnswer) {
+    const downloadedMessages = messagesAnswer.data;
+    messagesSection.innerHTML = ``;
+    for (let i = 0 ; i < downloadedMessages.length ; i++) {
+        if (shouldUserReadThisMessage(downloadedMessages[i])) {
+            const completeMessage = createMessage(downloadedMessages[i]);
+            messagesSection.innerHTML += completeMessage;
+        }
+    }
+    scrollDownIfNewMessage();
     if (pageStatus.messages === false) {
         pageStatus.messages = true;
         stopLoadingPage();
     }
 }
 
-function reloadVisibilityBar(element) {
+function searchChatRoomMessages() {
+    const messagesPromise = axios.get(API_LINKS.messages);
+    messagesPromise.then(loadChatRoomMessages);
+    messagesPromise.catch(reloadPage);
+}
+
+function updateInputSendingMessage(selectedSidebarOption,selectedSidebarList) {
+    if (selectedSidebarList.classList.contains("online-contacts")) {
+        messageInfo.recipient.name = selectedSidebarOption.querySelector("span").innerHTML;
+    } else {
+        if (selectedSidebarOption.querySelector("span").innerText === "Reservadamente") {
+            messageInfo.visibility = " (reservadamente)";
+            messageInfo.type = "private_message";
+        } else {
+            messageInfo.visibility = "";
+            messageInfo.type = "message";
+        }
+    }
+    const SendingMessageArea = document.querySelector("footer .message-recipient");
+    SendingMessageArea.innerHTML = `Enviando para ${messageInfo.recipient.name}${messageInfo.visibility}`;
+}
+
+function reloadVisibilityBar(selectedSidebarOption) {
     const sendToAllParticipants = sidebar.querySelector(".online-contacts :nth-child(2)");
     const privateMessageOption = sidebar.querySelector(".visibility-bar :nth-child(3)");
     const publicMessageOption = sidebar.querySelector(".visibility-bar :nth-child(2)");
-    if (element === sendToAllParticipants) {
-        privateMessageOption.classList.remove("selected")
-        privateMessageOption.classList.add("disabled")
-        selectSidebarOption(publicMessageOption);
-    } else if (element !== publicMessageOption) {
-        privateMessageOption.classList.remove("disabled")
+    if (selectedSidebarOption === sendToAllParticipants) {
+        privateMessageOption.classList.remove("selected");
+        privateMessageOption.classList.add("disabled");
+        activateSidebarOption(publicMessageOption);
+    } else if (selectedSidebarOption !== publicMessageOption) {
+        privateMessageOption.classList.remove("disabled");
     }
 }
 
-function selectSidebarOption(element){
-    if (!element.classList.contains("disabled")) {
-        selectedSidebarList = element.parentNode;
+function activateSidebarOption(selectedSidebarOption) {
+    if (!selectedSidebarOption.classList.contains("disabled")) {
+        selectedSidebarList = selectedSidebarOption.parentNode;
         const previouslySelectedItem = selectedSidebarList.querySelector(".selected");
         if (previouslySelectedItem) {
             previouslySelectedItem.classList.remove("selected");
         }
-        element.classList.add("selected");
-        if (selectedSidebarList.classList.contains("online-contacts")){
-            messageInfo.ionIconName = element.querySelector("div ion-icon").name;
+        selectedSidebarOption.classList.add("selected");
+        if (selectedSidebarList.classList.contains("online-contacts")) {
+            messageInfo.recipient.ionIcon = selectedSidebarOption.querySelector("div ion-icon").name;
         }
-        updateInputSendingMessage(element,selectedSidebarList);
-        reloadVisibilityBar(element);
+        updateInputSendingMessage(selectedSidebarOption,selectedSidebarList);
+        reloadVisibilityBar(selectedSidebarOption);
     }
 }
 
-function updateInputSendingMessage(element,selectedSidebarList) {
-    if (selectedSidebarList.classList.contains("online-contacts")){
-        messageInfo.recipient = element.querySelector("span").innerHTML
-    } else {
-        if (element.querySelector("span").innerText === "Reservadamente") {
-            messageInfo.visibility = " (reservadamente)"
-            messageInfo.type = "private_message"
-        } else {
-            messageInfo.visibility = "";
-            messageInfo.type = "message"
+function isAnyParticipantSelected(participantsArea) {
+    const selectedParticipant = participantsArea.querySelector(".selected");
+    if(!selectedParticipant) {
+        if (messageInfo.recipient.name !== "") {
+            alert(`O usuário ${messageInfo.recipient.name} saiu da sala!`);
         }
+        const sendToAllParticipants = participantsArea.querySelector(":nth-child(2)");
+        activateSidebarOption(sendToAllParticipants);
     }
-    const SendingMessageArea = document.querySelector("footer .message-recipient");
-    SendingMessageArea.innerHTML = `Enviando para ${messageInfo.recipient}${messageInfo.visibility}`
 }
 
-function searchChatRoomParticipants () {
-    let participantsPromise = axios.get(API_LINKS.participants);
-    participantsPromise.then(loadChatRoomParticipants);
-    participantsPromise.catch(reloadPage)
-}
-
-function loadChatRoomParticipants (participantsAnswer) {
-    let onlineParticipants = participantsAnswer.data;
-    onlineParticipants.unshift({name:"Todos"});
+function selectParticipantIcon(index) {
     let ionIcon;
+    if (index === 0) {
+        ionIcon = "people";
+    } else {
+        ionIcon = "person-circle";            
+    }
+    return ionIcon;
+}
+
+function selectParticipantClass(participant,participantIonIcon) {
     let participantClass;
-    const participantsArea = sidebar.querySelector(".online-contacts")
+    if (participant.name === messageInfo.recipient.name && messageInfo.recipient.ionIcon === participantIonIcon) {
+        participantClass = `class="selected"`;
+    } else {
+        participantClass = "";
+    }
+    if (participant.name === userName && participantIonIcon === "person-circle") {
+        participantClass = `class="disabled"`;
+    }
+    return participantClass;
+}
+
+
+function loadChatRoomParticipants(participantsAnswer) {
+    const onlineParticipants = participantsAnswer.data;
+    onlineParticipants.unshift({name:"Todos"});
+    const participantsArea = sidebar.querySelector(".online-contacts");
     participantsArea.innerHTML = `<li>Escolha um contato para enviar mensagem:</li>`;
-    for (let i = 0 ; i < onlineParticipants.length; i++) {
-        if (i === 0) {
-            ionIcon = "people";
-        } else {
-            ionIcon = "person-circle";            
-        }
-        if (onlineParticipants[i].name === messageInfo.recipient && messageInfo.ionIconName === ionIcon) {
-            participantClass = `class="selected"`
-        } else {
-            participantClass = ""
-        }
-        if (onlineParticipants[i].name === userName) {
-            participantClass = `class="disabled"`
-        }
+    for (let i = 0 ; i < onlineParticipants.length ; i++) {
+        const participantIonIcon = selectParticipantIcon(i);
+        const participantClass = selectParticipantClass(onlineParticipants[i],participantIonIcon);
         participantsArea.innerHTML += `
-        <li ${participantClass} onclick="selectSidebarOption(this)">
+        <li ${participantClass} onclick="activateSidebarOption(this)">
             <div>
-                <ion-icon name=${ionIcon}></ion-icon>
+                <ion-icon name=${participantIonIcon}></ion-icon>
                 <span>${onlineParticipants[i].name}</span>
             </div>
             <ion-icon class = "checkmark" name="checkmark-sharp"></ion-icon>              
         </li>`;   
     }
-    let selectedParticipant = participantsArea.querySelector(".selected")
-    if(!selectedParticipant){
-        if (messageInfo.recipient !== ""){
-            alert(`O usuário ${messageInfo.recipient} saiu da sala!`);
-        }
-        let sendToAllParticipants = participantsArea.querySelector(":nth-child(2)")
-        selectSidebarOption(sendToAllParticipants);
-    }
+    isAnyParticipantSelected(participantsArea);
     if (pageStatus.participants === false) {
         pageStatus.participants = true;
         stopLoadingPage();
     }
 }
 
-function sendMessage () {
+function searchChatRoomParticipants() {
+    const participantsPromise = axios.get(API_LINKS.participants);
+    participantsPromise.then(loadChatRoomParticipants);
+    participantsPromise.catch(reloadPage);
+}
+
+
+function startLoadingScreen() {
+    const initialScreenInputItems = initialScreen.querySelector(".input-screen");
+    initialScreenInputItems.classList.add("disabled");
+    const LoadingScreen = initialScreen.querySelector(".loading-screen");
+    LoadingScreen.classList.remove("disabled");
+}
+
+function openChatRoom() {
+    startLoadingScreen();
+    setInterval(searchChatRoomMessages,3000);
+    setInterval(searchChatRoomParticipants,10000);
+    setInterval(keepConnection,5000);
+}
+
+function printInitialScreenError(error) {
+    let errorMessage;
+    if (error.response.status === 400) {
+        errorMessage = "Ops... parece que houve um problema! Já existe alguém com esse nome na sala!";
+    } else {
+        errorMessage = "Ops... parece que houve um problema! Por favor, tente novamente em alguns minutos";
+    }
+    initialScreen.querySelector(".error-message").innerHTML = errorMessage;
+}
+
+function animateButton(thisButton) {
+    thisButton.classList.add("selected");
+    setTimeout(function () {
+        thisButton.classList.remove("selected");
+    },80)
+}
+
+function checkUserName(thisButton) {
+    animateButton(thisButton);
+    userName = initialScreen.querySelector("input").value;
+    const errorMessageArea = initialScreen.querySelector(".error-message");
+    errorMessageArea.innerHTML = "";
+    if (userName === "") {
+        errorMessageArea.innerHTML = "Por favor, digite um nome de usuário";
+        return;
+    }
+    const userNamePromise = axios.post(API_LINKS.participants, {name:userName});
+    userNamePromise.then(openChatRoom);
+    userNamePromise.catch(printInitialScreenError);
+}
+
+function sidebarSwitch() {
+    const darkScreen = document.querySelector(".dark-screen");
+    sidebar.classList.toggle("active");
+    darkScreen.classList.toggle("active");
+}
+
+function sendMessage(thisButton) {
+    animateButton(thisButton);
     messageInfo.text = document.querySelector("footer input").value;
-    document.querySelector("footer input").value = ""
+    document.querySelector("footer input").value = "";
     if (messageInfo.text !== "") {
-        let sentMessage = axios.post(API_LINKS.messages,{
+        const sentMessage = axios.post(API_LINKS.messages, {
         from: userName,
-        to: messageInfo.recipient,
+        to: messageInfo.recipient.name,
         type: messageInfo.type,
         text: messageInfo.text
-        })
+        });
         sentMessage.then(searchChatRoomMessages);
         sentMessage.catch(reloadPage);
 
@@ -270,9 +296,19 @@ function sendMessage () {
     }
 }
 
-const usernameInput =  initialScreen.querySelector("input");
-usernameInput.addEventListener("keyup", function(event) {
-    if (event.key === "Enter") {
-        checkUserName(initialScreen.querySelector("button"));
-    }
-});
+function activateInputsWithEnterKey() {
+    const usernameInput =  initialScreen.querySelector("input");
+    usernameInput.addEventListener("keyup", function(event) {
+        if (event.key === "Enter") {
+            checkUserName(initialScreen.querySelector("button"));
+        }
+    });
+    const messageInput = document.querySelector("footer input");
+    messageInput.addEventListener("keyup", function(event) {
+        if (event.key === "Enter") {
+            sendMessage(document.querySelector("footer button"));
+        }
+    });
+}
+
+activateInputsWithEnterKey();

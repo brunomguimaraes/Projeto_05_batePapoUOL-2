@@ -25,10 +25,7 @@ body {
     align-items: center;
 }
 
-.initial-screen.disabled {
-    display: none;
-}
-
+.initial-screen.disabled,
 .initial-screen .disabled {
     display: none;
 }
@@ -62,7 +59,6 @@ body {
     margin-top: 29px;
 }
 
-
 .initial-screen .input-screen .error-message {
     width: 100%;
     padding: 0px 50px;
@@ -82,11 +78,7 @@ body {
     animation: rotation 2s infinite linear;
 }
 
-
-
-
-/*Copied from internet.. I tried several times to keep it rotating using js*/
-@keyframes rotation { 
+@keyframes rotation {
     from {
         transform: rotate(0deg);
     }
@@ -98,7 +90,6 @@ body {
 .initial-screen .loading-screen span {
     font-size: 20px;
 }
-
 
 header {
     width: 100%;
@@ -124,7 +115,6 @@ header ion-icon {
     font-size: 42px;
 }
 
-
 .chat-room {
     background-color: #e5e5e5;
     padding-top: 100px;
@@ -132,7 +122,6 @@ header ion-icon {
     width: 100%;
     min-height: 100vh;
     word-wrap: break-word;
-
 }
 
 .chat-room li {
@@ -181,7 +170,7 @@ footer input {
     height: 30px;
     width: calc(100vw - 18px * 2 - 26px - 20px);
     font-size: 18px;
-    border:none;
+    border: none;
     outline : none;
 }
 
@@ -197,9 +186,14 @@ footer input::placeholder {
     font-style: italic;
 }
 
-footer ion-icon {
+footer button {
     font-size: 26px;
     margin-left: 20px;
+    margin-top: 0px;
+}
+
+footer button.selected {
+    margin-top: 5px;
 }
 
 .dark-screen {
@@ -218,7 +212,6 @@ footer ion-icon {
     display: block;
 }
 
-
 .sidebar {
     height: 100vh;
     width: 70vw;
@@ -233,7 +226,7 @@ footer ion-icon {
 }
 
 .sidebar.active {
-    right:0;
+    right: 0;
     transition: all 100ms linear;
 }
 
@@ -262,14 +255,13 @@ footer ion-icon {
     align-items: center;
 }
 
-.sidebar li.disabled{
+.sidebar li.disabled {
     color: #aeaeae;
 }
 
 .sidebar li div ion-icon {
     margin-right: 8px ;
     font-size: 24px;
-
 }
 
 .sidebar li .checkmark {
